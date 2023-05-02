@@ -23,16 +23,21 @@ def home(request):
                        f'{query} i', f'{query} j', f'{query} k', f'{query} m', f'{query} n', f'{query} o', f'{query} p',
                        f'{query} q', f'{query} r', f'{query} s', f'{query} t', f'{query} u', f'{query} v', f'{query} w',
                        f'{query} x', f'{query} y', f'{query} z', f'{query} 1', f'{query} 2', f'{query} 3', f'{query} 4',
-                       f'{query} 5', f'{query} 6', f'{query} 7', f'{query} 8', f'{query} 9', f'{query} 0']
+                       f'{query} 5', f'{query} 6', f'{query} 7', f'{query} 8', f'{query} 9', f'{query} 0', ]
 
         for letter in suggestion_letters:
-            params['q'] = f'{query} {letter}'
-            url = f'http://suggestqueries.google.com/complete/search?hl=en&ds=yt&client=youtube&hjson=t&cp=1&q={params["q"]}&format=5&alt'
-            resp = requests.get(url, params=params)
+            # create a new dict for each request to avoid overwriting
+            params_new = params.copy()
+            params_new['q'] = letter
+            url_new = f'http://suggestqueries.google.com/complete/search?hl=en&ds=yt&client=youtube&hjson=t&cp=1&q={params_new["q"]}&format=5&alt'
+            resp = requests.get(url_new, params=params_new)
             result = resp.json()[1]
 
             suggestions += result
             all_results.append(result)
+
+        # remove duplicates from the suggestions list
+        suggestions = list(set(suggestions))
 
     context = {
         'query': query,
